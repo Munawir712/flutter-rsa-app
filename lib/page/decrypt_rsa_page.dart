@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pointycastle/pointycastle.dart';
 
 import '../core/constant.dart';
 import '../core/encrypt_rsa.dart';
@@ -14,6 +17,14 @@ class DecryptRSAPage extends StatefulWidget {
 class _DecryptRSAPageState extends State<DecryptRSAPage> {
   final TextEditingController _textEditingController = TextEditingController();
   String _decryptedText = '';
+  // late AsymmetricKeyPair<PublicKey, PrivateKey> keyPair;
+
+  @override
+  void initState() {
+    super.initState();
+    // keyPair = RSAEncrypta.generateRSAKeyPair(RSAEncrypta.getSecureRandom(),
+    //     keyLength: 4096);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +71,23 @@ class _DecryptRSAPageState extends State<DecryptRSAPage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (isBase64(_textEditingController.text) ==
-                    _textEditingController.text.isNotEmpty) {
-                  _decryptedText = await RSAEncrypta.decryptText(
-                      _textEditingController.text);
+                // if (isBase64(_textEditingController.text) ==
+                //     _textEditingController.text.isNotEmpty) {
+                //   _decryptedText = await RSAEncrypta.decryptText(
+                //       _textEditingController.text);
+                //   setState(() {});
+                // }
+                final text = _textEditingController.text;
+                try {
+                  // _decryptedText = await RSAEncrypta.decryptText(text, keyPair);
+                  _decryptedText = await RSAEncrypta.decryptText(text);
                   setState(() {});
+                } catch (e) {
+                  log(e.toString());
+                  log('Input already decrypted');
                 }
               },
-              child: const Text('Dekripsi'),
+              child: const Text('Decrypt'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -112,6 +132,7 @@ class _DecryptRSAPageState extends State<DecryptRSAPage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
             ],
             Row(
               children: [
@@ -126,7 +147,7 @@ class _DecryptRSAPageState extends State<DecryptRSAPage> {
                       backgroundColor: const Color(0xFF4ec95b),
                     ),
                     onPressed: () {
-                      forwardToWhatsApp(_decryptedText);
+                      forwardToWhatsApp(_decryptedText, isDecrypt: true);
                     },
                     label: const Text('Kirim ke WhatsApp'),
                   ),
@@ -142,7 +163,7 @@ class _DecryptRSAPageState extends State<DecryptRSAPage> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red.shade400),
                     onPressed: () {
-                      forwardToEmail(_decryptedText);
+                      forwardToEmail(_decryptedText, isDecrypt: true);
                     },
                     label: const Text('Kirim ke Email'),
                   ),

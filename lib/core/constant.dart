@@ -5,20 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void forwardToWhatsApp(String encryptedText) async {
-  final formattedMessage =
-      Uri.encodeComponent('Pesan Enkripsi: $encryptedText');
+void forwardToWhatsApp(String encryptedText, {bool isDecrypt = false}) async {
+  final formattedMessage = Uri.encodeComponent(
+      isDecrypt ? encryptedText : 'Pesan Enkripsi: $encryptedText');
   final url = 'whatsapp://send?text=$formattedMessage';
 
   await launchUrl(Uri.parse(url));
 }
 
-void forwardToEmail(String encryptedText) async {
+void forwardToEmail(String encryptedText, {bool isDecrypt = false}) async {
+  String query = isDecrypt
+      ? 'subject=${Uri.encodeComponent('Pesan')}&body=${Uri.encodeComponent('Pesan: $encryptedText')}'
+      : 'subject=${Uri.encodeComponent('Pesan Enkripsi')}&body=${Uri.encodeComponent('Pesan Enkripsi: $encryptedText')}';
   final Uri params = Uri(
     scheme: 'mailto',
     path: encryptedText,
-    query:
-        'subject=${Uri.encodeComponent('Pesan Enkripsi')}&body=${Uri.encodeComponent('Pesan Enkripsi: $encryptedText')}',
+    query: query,
   );
 
   String url = params.toString();
@@ -32,16 +34,4 @@ void copyText(String text, context) {
     content: Text('Teks berhasil disalin!'),
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-}
-
-bool isBase64(String input) {
-  try {
-    final decodedBytes = base64.decode(input);
-    final decodedText = Uint8List.fromList(decodedBytes);
-    final encodedText = base64.encode(decodedText);
-    log((encodedText == input).toString());
-    return encodedText == input;
-  } catch (e) {
-    return false;
-  }
 }

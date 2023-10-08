@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pointycastle/pointycastle.dart';
 
 import '../core/constant.dart';
 import '../core/encrypt_rsa.dart';
@@ -15,6 +18,13 @@ class _EncryptRSAPageState extends State<EncryptRSAPage> {
   final TextEditingController _textEditingController = TextEditingController();
 
   String _encryptedText = '';
+  // late AsymmetricKeyPair<PublicKey, PrivateKey> keyPair;
+  @override
+  void initState() {
+    super.initState();
+    // keyPair = RSAEncrypta.generateRSAKeyPair(RSAEncrypta.getSecureRandom(),
+    //     keyLength: 4096);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +71,23 @@ class _EncryptRSAPageState extends State<EncryptRSAPage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (!isBase64(_textEditingController.text) ==
-                    _textEditingController.text.isNotEmpty) {
-                  _encryptedText = await RSAEncrypta.encryptText(
-                      _textEditingController.text);
+                final text = _textEditingController.text;
+                try {
+                  // _encryptedText = await RSAEncrypta.encryptText(text, keyPair);
+                  _encryptedText = await RSAEncrypta.encryptText(text);
                   setState(() {});
+                } catch (e) {
+                  log(e.toString());
+                  log('Input already encrypted');
                 }
+                // if (!isBase64(_textEditingController.text) ==
+                //     _textEditingController.text.isNotEmpty) {
+                //   _encryptedText = await RSAEncrypta.encryptText(
+                //       _textEditingController.text);
+                //   setState(() {});
+                // }
               },
-              child: const Text('Enkripsi'),
+              child: const Text('Encrypt'),
             ),
             ElevatedButton(
               onPressed: () {

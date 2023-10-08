@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pointycastle/pointycastle.dart';
 
 import '../core/constant.dart';
 import '../core/encrypt_rsa.dart';
@@ -20,12 +23,15 @@ class _EncryptionPageState extends State<EncryptionPage>
   final TextEditingController _textEditingController = TextEditingController();
   String _encryptedText = '';
   String _decryptedText = '';
+  // late AsymmetricKeyPair<PublicKey, PrivateKey> keyPair;
 
   @override
   void initState() {
     super.initState();
     _tabbarController =
         TabController(length: 3, initialIndex: currentIndex, vsync: this);
+    // keyPair = RSAEncrypta.generateRSAKeyPair(RSAEncrypta.getSecureRandom(),
+    //     keyLength: 4096);
   }
 
   @override
@@ -47,7 +53,7 @@ class _EncryptionPageState extends State<EncryptionPage>
           ],
         ),
       ),
-      body: Padding(
+      body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: IndexedStack(
           index: currentIndex,
@@ -98,12 +104,28 @@ class _EncryptionPageState extends State<EncryptionPage>
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () async {
-                            if (!isBase64(_textEditingController.text) ==
-                                _textEditingController.text.isNotEmpty) {
-                              _encryptedText = await RSAEncrypta.encryptText(
-                                  _textEditingController.text);
+                            final text = _textEditingController.text;
+                            try {
+                              // _encryptedText =
+                              //     await RSAEncrypta.encryptText(text, keyPair);
+                              _encryptedText =
+                                  await RSAEncrypta.encryptText(text);
                               setState(() {});
+                            } catch (e) {
+                              log(e.toString());
+                              log('Input already encrypted');
                             }
+                            // final text = _textEditingController.text;
+
+                            // if (text == _encryptedText) {
+                            //   log('Input already encrypted');
+                            //   return;
+                            // }
+                            // final encryptedData =
+                            //     await RSAEncrypta.encryptText(text);
+                            // setState(() {
+                            //   _encryptedText = encryptedData;
+                            // });
                           },
                           child: const Text('Encrypt'),
                         ),
@@ -112,11 +134,22 @@ class _EncryptionPageState extends State<EncryptionPage>
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () async {
-                            if (isBase64(_textEditingController.text) ==
-                                _textEditingController.text.isNotEmpty) {
-                              _decryptedText = await RSAEncrypta.decryptText(
-                                  _textEditingController.text);
+                            // if (isBase64(_textEditingController.text) ==
+                            //     _textEditingController.text.isNotEmpty) {
+                            //   _decryptedText = await RSAEncrypta.decryptText(
+                            //       _textEditingController.text, keyPair);
+                            //   setState(() {});
+                            // }
+                            final text = _textEditingController.text;
+                            try {
+                              // _decryptedText =
+                              //     await RSAEncrypta.decryptText(text, keyPair);
+                              _decryptedText =
+                                  await RSAEncrypta.decryptText(text);
                               setState(() {});
+                            } catch (e) {
+                              log(e.toString());
+                              log('Input already decrypted');
                             }
                           },
                           child: const Text('Decrypt'),
@@ -203,6 +236,7 @@ class _EncryptionPageState extends State<EncryptionPage>
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
                   ],
                   Row(
                     children: [

@@ -5,6 +5,7 @@ import 'package:rsa_app/page/encryption_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // rsaExample();
+  // RSAEncrypta.instace();
   runApp(const MyApp());
 }
 
